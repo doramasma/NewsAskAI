@@ -1,0 +1,41 @@
+[project]
+name = "project_template" #TODO: Update to the project name
+version = "0.1.0"
+description = "Add your description here" #TODO: Update to the project name
+authors = [{ name = "Doramas Baez Bernal", email = "doramas6@hotmail.com" }]
+readme = "README.md"
+keywords = ['Python', 'template', 'uv']
+requires-python = ">=3.12.8"
+dependencies = [
+    "mypy>=1.14.1",
+    "ruff>=0.8.6",
+]
+
+[project.scripts]
+"app" = "project_template:main" #TODO: Update to the project name
+
+[tool.mypy]
+strict = true
+ignore_missing_imports = true
+allow_untyped_globals = false
+allow_redefinition = true
+check_untyped_defs = true
+color_output = true
+error_summary = true
+pretty = true
+
+[tool.ruff]
+target-version = "py312" 
+line-length = 120
+indent-width = 4
+fix = true
+
+[tool.ruff.format]
+indent-style = "space"
+line-ending = "auto"
+quote-style = "double"
+skip-magic-trailing-comma = false
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
