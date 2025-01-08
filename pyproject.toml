@@ -1,7 +1,7 @@
 [project]
-name = "project_template" #TODO: Update to the project name
+name = "news_ask_ai"
 version = "0.1.0"
-description = "Add your description here" #TODO: Update to the project name
+description = "NewsAskAI is an open-source project that scrapes the latest news and generates a list of the most relevant ones. It allow users to ask questions about the news"
 authors = [{ name = "Doramas Baez Bernal", email = "doramas6@hotmail.com" }]
 readme = "README.md"
 keywords = ['Python', 'template', 'uv']
@@ -9,19 +9,22 @@ requires-python = ">=3.12.8"
 dependencies = [
     "mypy>=1.14.1",
     "ruff>=0.8.6",
+    "chromadb>=0.6.2"
 ]
 
 [project.scripts]
-"app" = "project_template:main" #TODO: Update to the project name
+"app" = "news_ask_ai:main"
 
 [tool.mypy]
 strict = true
-ignore_missing_imports = true
+ignore_missing_imports = false
 allow_untyped_globals = false
 allow_redefinition = true
 check_untyped_defs = true
 color_output = true
 error_summary = true
+warn_return_any = true
+warn_no_return = true
 pretty = true
 
 [tool.ruff]
