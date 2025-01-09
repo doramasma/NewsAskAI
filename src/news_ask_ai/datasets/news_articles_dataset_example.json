@@ -1,0 +1,32 @@
+[
+    {
+        "title": "AI Revolutionizes Healthcare",
+        "content": "Artificial Intelligence is transforming the healthcare industry with advanced diagnostics and personalized medicine.",
+        "date": "2025-01-01",
+        "tags": ["AI", "healthcare", "technology"]
+    },
+    {
+        "title": "SpaceX Launches New Rocket",
+        "content": "SpaceX successfully launched its Falcon Heavy rocket, marking a milestone in reusable rocket technology.",
+        "date": "2025-01-03",
+        "tags": ["SpaceX", "space exploration", "technology"]
+    },
+    {
+        "title": "Climate Change: Global Temperatures Hit Record Highs",
+        "content": "2024 was the hottest year on record, highlighting the urgent need for climate action.",
+        "date": "2025-01-02",
+        "tags": ["climate change", "environment", "global warming"]
+    },
+    {
+        "title": "New Electric Car Breaks Range Record",
+        "content": "Tesla's latest model achieves 1000 km on a single charge, setting a new industry standard for electric vehicle range.",
+        "date": "2025-01-08",
+        "tags": ["Electric Car", "New record", "technology"]
+    },
+    {
+        "title": "AI Breakthrough in Medical Diagnosis",
+        "content": "A new AI system developed by DeepMind accurately diagnoses rare diseases, outperforming human doctors in initial trials.",
+        "date": "2025-01-07",
+        "tags": ["AI", "healthcare", "Medical Diagnosis"]
+    }
+]
