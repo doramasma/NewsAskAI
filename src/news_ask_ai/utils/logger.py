@@ -14,7 +14,9 @@ def setup_logger(level: int = logging.INFO) -> logging.Logger:
     """
     # Create a logger
     logger = logging.getLogger()
-    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+    if logger.hasHandlers():
+        logger.handlers.clear()
+
     logger.setLevel(level)
 
     # Create a console handler for outputting logs to the console
