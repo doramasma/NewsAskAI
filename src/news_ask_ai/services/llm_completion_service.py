@@ -1,7 +1,12 @@
-import torch
 from typing import cast
-from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline # type: ignore
 
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline  # type: ignore
+
+from news_ask_ai.services.prompts.news_rag_prompts import (
+    get_system_prompt,
+    get_user_prompt,
+)
 from news_ask_ai.utils.logger import setup_logger
 
 logger = setup_logger()
@@ -9,10 +14,10 @@ logger = setup_logger()
 # Input Format:
 # The phi-4 model is best suited for prompts formatted as a chat, using special tokens.
 # Each message should follow this structure:
-# 
+#
 # <|im_start|><role><|im_sep|>
 # <content><|im_end|>
-# 
+#
 # Example:
 # <|im_start|>system<|im_sep|>
 # You are a medieval knight and must provide explanations to modern people.<|im_end|>
@@ -33,29 +38,27 @@ class LLMCompletionService:
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         self.model = AutoModelForCausalLM.from_pretrained(
-            model_name, 
-            device_map="cuda", 
-            torch_dtype="auto", 
-            trust_remote_code=True, 
+            model_name,
+            device_map="cuda",
+            torch_dtype="auto",
+            trust_remote_code=True,
         )
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-    
 
-    def get_completions(
-        self, 
-        messages: list[dict[str, str]], 
-        max_new_tokens: int = 500
-    ) -> str:
+    def get_completions(self, documents: list[str], question: str, max_new_tokens: int = 500) -> str:
         """
         Generate completions based on the provided messages.
-
-        Args:
-            messages (list[dict]): A list of dictionaries with 'role' and 'content' keys.
-            max_new_tokens (int): The maximum number of tokens to generate.
-
-        Returns:
-            str: The generated completion text.
         """
+        logger.info(f"Creating response for the question: {question}")
+
+        formatted_documents = "\n".join(f"document {i + 1}: {s}" for i, s in enumerate(documents))
+        messages = [
+            {"role": "system", "content": get_system_prompt()},
+            {
+                "role": "user",
+                "content": get_user_prompt(formatted_documents, question),
+            },
+        ]
 
         pipe = pipeline(
             "text-generation",
@@ -71,5 +74,4 @@ class LLMCompletionService:
         }
 
         output = pipe(messages, **generation_args)
-        return cast(str, output[0]['generated_text'])
-
+        return cast(str, output[0]["generated_text"])
