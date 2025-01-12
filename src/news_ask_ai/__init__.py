@@ -1,38 +1,25 @@
-import json
-from news_ask_ai.services.chroma_service import ChromaDBService
-from news_ask_ai.services.embedding_service import EmbeddingService
-from news_ask_ai.services.llm_completion_service import LLMCompletionService
+from news_ask_ai.ask.news_ask_engine import NewsAskEngine
+
+from news_ask_ai.utils.logger import setup_logger
+
+logger = setup_logger()
 
 
 def main() -> None:
-    chroma_service = ChromaDBService("news-collection")
-    embedding_service = EmbeddingService()
-    llm_service = LLMCompletionService()
+    logger.info("Initializing RAG engine...")
+    search_engine = NewsAskEngine(collection_name="news-collection")
 
-    # Reading example news dataset
-    with open("src/news_ask_ai/datasets/news_articles_dataset_example.json", "r", encoding="utf-8") as file:
-        news_articles = json.load(file)
+    print("Indicate the topic of the news you want to ask about")
+    topic_input = input("\nYour topic: ")
+    search_engine.ingest_data(topic_input)
 
-    # Example of ingestion
-    for ids, articles in enumerate(news_articles):
-        document = f"Title: {articles['title']}\n content: {articles['content']}"
-        document_embedding = embedding_service.get_embeddings([document])
-        metadata = [{"date": articles["date"], "tags": ", ".join(articles["tags"])}]
-        chroma_service.add_documents([document], document_embedding, metadata=metadata, ids=[str(ids)])
+    while True:
+        print("What do you want to ask about?")
+        question_input = input("\nYour question: ")
+        if question_input.lower() == "exit":
+            break
 
-    # Example of recovering documents
-    query = "I'm interested in rocket science, what are the lastest news"
-    query_embedding = embedding_service.get_embeddings([query])
-    retrieve_documents = chroma_service.retrieve_documents(query_embedding)
-    print(retrieve_documents)
-    if not retrieve_documents["documents"]:
-        print("No documents retrieved for the question.")
-        raise ValueError("Documents are required to generate completions.")
-
-    # Example of using the LLM
-    try:
-        question = "what electric car got a record?"
-        completion = llm_service.get_completions(retrieve_documents["documents"][0], question)
+        completion = search_engine.get_completions(question_input)
         print(completion)
-    except Exception as e:
-        print(f"An error occurred: {e}")
+
+    print("Thank you for using the NewsAskAI system. Goodbye!")
