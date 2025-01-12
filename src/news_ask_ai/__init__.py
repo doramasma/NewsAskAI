@@ -25,14 +25,14 @@ def main() -> None:
     query_embedding = embedding_service.get_embeddings([query])
     retrieve_documents = chroma_service.retrieve_documents(query_embedding)
     print(retrieve_documents)
+    if not retrieve_documents["documents"]:
+        print("No documents retrieved for the question.")
+        raise ValueError("Documents are required to generate completions.")
 
     # Example of using the LLM
     try:
         question = "what electric car got a record?"
-        completion = llm_service.get_completions(retrieve_documents["documents"], question)
+        completion = llm_service.get_completions(retrieve_documents["documents"][0], question)
         print(completion)
     except Exception as e:
         print(f"An error occurred: {e}")
-
-
-main()
