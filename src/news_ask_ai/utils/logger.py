@@ -1,5 +1,6 @@
 import logging
 
+
 def setup_logger(level: int = logging.INFO) -> logging.Logger:
     """
     Set up a logger with the specified name, log file, and level.
@@ -24,9 +25,7 @@ def setup_logger(level: int = logging.INFO) -> logging.Logger:
     console_handler.setLevel(level)
 
     # Define a log format
-    formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
+    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     console_handler.setFormatter(formatter)
 
     # Add handlers to the logger

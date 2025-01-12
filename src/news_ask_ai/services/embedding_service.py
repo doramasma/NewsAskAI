@@ -1,4 +1,3 @@
-
 from sentence_transformers import SentenceTransformer
 
 from news_ask_ai.utils.logger import setup_logger
@@ -14,7 +13,7 @@ class EmbeddingService:
     def __init__(self, model_name: str = "BAAI/bge-large-en-v1.5") -> None:
         logger.info(f"Initializing the embedding model: {model_name}")
         self.model = SentenceTransformer(model_name)
-    
+
     def get_embeddings(self, text_to_embed: list[str]) -> list[list[float]]:
         """
         Generate embeddings for the given list of text inputs.
