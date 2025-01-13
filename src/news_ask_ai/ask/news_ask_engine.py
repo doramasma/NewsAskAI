@@ -1,3 +1,5 @@
+import uuid
+
 from news_ask_ai.services.chroma_service import ChromaDBService
 from news_ask_ai.services.embedding_service import EmbeddingService
 from news_ask_ai.services.llm_completion_service import LLMCompletionService
@@ -37,11 +39,13 @@ class NewsAskEngine:
 
         news_articles = self.news_service.search_news(news_topic)
 
-        for ids, articles in enumerate(news_articles):
+        for articles in news_articles:
             document = f"Title: {articles.title}\n content: {articles.description}"
             document_embedding = self.embedding_service.get_embeddings([document])
             metadata = [{"date": articles.published_date, "url": ", ".join(articles.url)}]
-            self.chroma_service.add_documents([document], document_embedding, metadata=metadata, ids=[str(ids)])
+            self.chroma_service.add_documents(
+                [document], document_embedding, metadata=metadata, ids=[str(uuid.uuid4())]
+            )
 
         logger.info("Data ingestion complete.")
 
