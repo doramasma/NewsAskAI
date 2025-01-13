@@ -13,6 +13,13 @@ This project includes a Makefile to automate common tasks like linting, type che
 ```console
 $ make install
 ```
+
+For systems with CUDA support:
+
+```console
+$ make install-cuda
+```
+
 ### Run the application after performing linting and type checking:
 
 ```console

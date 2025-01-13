@@ -36,14 +36,30 @@ class LLMCompletionService:
 
         torch.random.manual_seed(0)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        logger.info(f"Using device: {self.device}")
+
+        model_kwargs = {
+            "device_map": "cuda" if self.device.type == "cuda" else "cpu",
+            "torch_dtype": "auto",
+            "trust_remote_code": True,
+        }
+
+        if self.device.type == "cuda":
+            model_kwargs["attn_implementation"] = "flash_attention_2"
 
         self.model = AutoModelForCausalLM.from_pretrained(
             model_name,
-            device_map="cuda",
-            torch_dtype="auto",
-            trust_remote_code=True,
-        )
+            **model_kwargs,
+        ).eval()
+
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+        with torch.no_grad():
+            self.completion_pipeline = pipeline(
+                "text-generation",
+                model=self.model,
+                tokenizer=self.tokenizer,
+            )
 
     def get_completions(self, documents: list[str], question: str, max_new_tokens: int = 500) -> str:
         """
@@ -60,12 +76,6 @@ class LLMCompletionService:
             },
         ]
 
-        pipe = pipeline(
-            "text-generation",
-            model=self.model,
-            tokenizer=self.tokenizer,
-        )
-
         generation_args = {
             "max_new_tokens": max_new_tokens,
             "return_full_text": False,
@@ -73,5 +83,7 @@ class LLMCompletionService:
             "do_sample": False,
         }
 
-        output = pipe(messages, **generation_args)
+        with torch.no_grad():
+            output = self.completion_pipeline(messages, **generation_args)
+
         return cast(str, output[0]["generated_text"])

@@ -1,7 +1,17 @@
+# Installation:
+# - For systems without CUDA: make install
+# - For systems with CUDA: make install-cuda
+
 .PHONY: install
 install:
 	@echo "🚀 Creating virtual environment"
 	@uv sync
+
+.PHONY: install-cuda
+install-cuda:
+	@echo "🚀 Creating virtual environment with Cuda"
+	@uv sync
+	@uv pip install ".[cuda]"
 
 .PHONY: check
 check:

@@ -1,8 +1,9 @@
-import json
 from news_ask_ai.services.chroma_service import ChromaDBService
 from news_ask_ai.services.embedding_service import EmbeddingService
 from news_ask_ai.services.llm_completion_service import LLMCompletionService
+from news_ask_ai.services.search_news_service import SearchNewsService
 from news_ask_ai.utils.logger import setup_logger
+from datetime import date
 
 logger = setup_logger()
 
@@ -22,19 +23,24 @@ class NewsAskEngine:
         self.embedding_service = EmbeddingService(embedding_model_name)
         self.llm_service = LLMCompletionService(llm_model_name)
 
+        self.news_service = SearchNewsService(
+            language="en",
+            country="US",
+            max_results=10,
+            start_date=date(2025, 1, 1),
+            end_date=date(2025, 1, 13),
+        )
+
     # TODO: Create a search engine for finding the news related to the topic
     def ingest_data(self, news_topic: str) -> None:
         logger.info("Ingesting data...")
-        print(news_topic)
 
-        # Example of ingestion
-        with open("src/news_ask_ai/datasets/news_articles_dataset_example.json", "r", encoding="utf-8") as file:
-            news_articles = json.load(file)
+        news_articles = self.news_service.search_news(news_topic)
 
         for ids, articles in enumerate(news_articles):
-            document = f"Title: {articles['title']}\n content: {articles['content']}"
+            document = f"Title: {articles.title}\n content: {articles.description}"
             document_embedding = self.embedding_service.get_embeddings([document])
-            metadata = [{"date": articles["date"], "tags": ", ".join(articles["tags"])}]
+            metadata = [{"date": articles.published_date, "url": ", ".join(articles.url)}]
             self.chroma_service.add_documents([document], document_embedding, metadata=metadata, ids=[str(ids)])
 
         logger.info("Data ingestion complete.")
