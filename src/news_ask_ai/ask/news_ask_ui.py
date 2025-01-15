@@ -4,7 +4,7 @@ from textual.containers import Horizontal, Container
 
 from textual.widget import Widget
 
-# from news_ask_ai.ask.news_ask_engine import NewsAskEngine
+from news_ask_ai.ask.news_ask_engine import NewsAskEngine
 from news_ask_ai.utils.logger import setup_logger
 
 logger = setup_logger()
@@ -32,6 +32,7 @@ class NewsAskUI(App):  # type: ignore
     def __init__(self) -> None:
         super().__init__()
         logger.info("Initializing RAG engine...")
+        self.search_engine = NewsAskEngine(collection_name="news-collection")
 
     def compose(self) -> ComposeResult:
         yield Header()
@@ -81,15 +82,15 @@ class NewsAskUI(App):  # type: ignore
         if button.id == "news_ingest_button":
             news_topic_input = self.query_one("#news_topic_input", Input)
             if not news_topic_input.value.strip():
-                return  # No topic entered, do nothing or prompt us
+                return
 
             conversation_container = self.query_one("#news_topic_container")
-            conversation_container.display = False  # remove 'none', showing it
+            conversation_container.display = False
 
             conversation_container = self.query_one("#conversation_container")
-            conversation_container.display = True  # remove 'none', showing it
+            conversation_container.display = True
 
-            # TODO: Ingestion routine
+            self.search_engine.ingest_data(news_topic_input.value)
 
         elif button.id == "conversation_button":
             await self.conversation()
@@ -109,4 +110,11 @@ class NewsAskUI(App):  # type: ignore
         with message_input.prevent(Input.Changed):
             message_input.value = ""
 
-        conversation_box.mount(MessageBox("Test", "test"))
+        completion = self.search_engine.get_completions(message_input.value)
+
+        conversation_box.mount(
+            MessageBox(
+                text=completion,
+                role="answer",
+            )
+        )
