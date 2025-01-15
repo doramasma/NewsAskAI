@@ -4,6 +4,15 @@ from textual.containers import Horizontal, Container
 
 from textual.widget import Widget
 
+# from news_ask_ai.ask.news_ask_engine import NewsAskEngine
+from news_ask_ai.utils.logger import setup_logger
+
+logger = setup_logger()
+
+
+class ConversationalContainer(Container, can_focus=True):
+    """Conversational container widget."""
+
 
 class MessageBox(Widget):
     def __init__(self, text: str, role: str) -> None:
@@ -19,6 +28,10 @@ class NewsAskUI(App):  # type: ignore
     TITLE = "NewsAskAI"
     SUB_TITLE = "Ask questions about the news directly in your terminal"
     CSS_PATH = "../static/css/styles.css"
+
+    def __init__(self) -> None:
+        super().__init__()
+        logger.info("Initializing RAG engine...")
 
     def compose(self) -> ComposeResult:
         yield Header()
@@ -39,17 +52,18 @@ class NewsAskUI(App):  # type: ignore
 
         # -- Container for conversation UI, hidden by default.
         with Container(id="conversation_container"):
-            yield MessageBox(
-                "You're all set to explore the news!\n"
-                "Type a question about the ingested news and press 'Ask' to get your answer.\n"
-                "Wait for the response...\n"
-                "Need assistance? Commands are listed at the bottom.",
-                role="info",
-            )
+            with ConversationalContainer(id="conversation_box"):
+                yield MessageBox(
+                    "You're all set to explore the news!\n"
+                    "Type a question about the ingested news and press 'Ask' to get your answer.\n"
+                    "Wait for the response...\n"
+                    "Need assistance? Commands are listed at the bottom.",
+                    role="info",
+                )
 
-            with Horizontal(id="input_box"):
-                yield Input(placeholder="Enter your question", id="conversation_input")
-                yield Button(label="Ask", variant="success", id="conversation_button")
+                with Horizontal(id="input_box"):
+                    yield Input(placeholder="Enter your question", id="conversation_input")
+                    yield Button(label="Ask", variant="success", id="conversation_button")
 
         yield Footer()
 
@@ -77,5 +91,22 @@ class NewsAskUI(App):  # type: ignore
 
             # TODO: Ingestion routine
 
-        elif button.id == "send_button":
-            pass
+        elif button.id == "conversation_button":
+            await self.conversation()
+
+    async def conversation(self) -> None:
+        message_input = self.query_one("#conversation_input", Input)
+        if message_input.value == "":
+            return
+
+        conversation_box = self.query_one("#conversation_box")
+
+        message_box = MessageBox(message_input.value, "question")
+        conversation_box.mount(message_box)
+        conversation_box.scroll_end(animate=True)
+
+        # Clean up the input without triggering events
+        with message_input.prevent(Input.Changed):
+            message_input.value = ""
+
+        conversation_box.mount(MessageBox("Test", "test"))
