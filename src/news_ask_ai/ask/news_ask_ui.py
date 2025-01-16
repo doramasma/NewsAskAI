@@ -110,7 +110,7 @@ class NewsAskUI(App):  # type: ignore
         with message_input.prevent(Input.Changed):
             message_input.value = ""
 
-        completion = self.search_engine.get_completions(message_input.value)
+        completion = self.search_engine.get_completions(message_box.text)
 
         conversation_box.mount(
             MessageBox(
