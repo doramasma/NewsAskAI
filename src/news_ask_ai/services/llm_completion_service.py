@@ -1,3 +1,4 @@
+import logging
 from typing import cast
 
 import torch
@@ -10,6 +11,9 @@ from news_ask_ai.services.prompts.news_rag_prompts import (
 from news_ask_ai.utils.logger import setup_logger
 
 logger = setup_logger()
+
+logging.getLogger("transformers").setLevel(logging.ERROR)
+logging.getLogger("torch").setLevel(logging.ERROR)
 
 # Input Format:
 # The phi-4 model is best suited for prompts formatted as a chat, using special tokens.
@@ -36,6 +40,7 @@ class LLMCompletionService:
 
         torch.random.manual_seed(0)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
         logger.info(f"Using device: {self.device}")
 
         model_kwargs = {

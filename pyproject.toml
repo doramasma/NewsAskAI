@@ -13,7 +13,8 @@ dependencies = [
     "sentence-transformers>=3.3.1",
     "transformers>=4.48.0",
     "accelerate>=1.2.1",
-    "gnews>=0.3.9"
+    "gnews>=0.3.9",
+    "textual>=1.0.0"
 ]
 
 [project.optional-dependencies]
