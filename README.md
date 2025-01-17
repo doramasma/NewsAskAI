@@ -10,6 +10,14 @@
 
 Additionally, it features a user interface built with Textual, replicating the experience of a conversational chat.
 
+## Example
+
+<div align="center">
+
+<img src="./src/news_ask_ai/static/assets/usage_example.gif" width="1280em" ></img> 
+
+</div>
+
 ## 🚧 **Work in Progress: Future Steps**  
 
 - **Download Full Articles**: Implement functionality to download the entire article found based on the specified topic. 
@@ -21,13 +29,6 @@ Additionally, it features a user interface built with Textual, replicating the e
 - **Topic Modeling / Named Entity Recognition**: Add advanced features, such as a second processing stage, to label or tag articles for more efficient query filtering or to perform reranking of the embeddings.
   - *Example: Allow users to filter results by entities (e.g., “Filter by entity: ‘Doramas Baez’”) or specific topics.*
 
-## Examples
-
-<div align="center">
-
-<img src="./src/news_ask_ai/static/assets/usage_example.gif" width="1250em" ></img> 
-
-</div>
 
 ## How to Use It
 
