@@ -29,6 +29,38 @@ Additionally, it features a user interface built with Textual, replicating the e
 - **Topic Modeling / Named Entity Recognition**: Add advanced features, such as a second processing stage, to label or tag articles for more efficient query filtering or to perform reranking of the embeddings.
   - *Example: Allow users to filter results by entities (e.g., “Filter by entity: ‘Doramas Baez’”) or specific topics.*
 
+## Requirements
+
+### Windows 
+
+- **uv**: it provides a standalone installer to download and install uv:
+
+  ```<sh>
+  powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+  ```
+
+- **make**: To install make in windows we will need to have chocolatey, to install it you should run in admin mode the following command:
+  ```<sh>
+  Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+  ```
+ 
+  Then, to install make do this:
+    ```<sh>
+    choco install make
+    ```
+-  **Microsoft Visual C++ 14.0**:
+    ```<sh>
+    choco install visualstudio2022buildtools visualstudio2022-workload-vctools
+    ```
+
+### macOS/linux
+
+**Uv** is a single command line executable. There are a number of ways to install it, but the easiest is to use the provided installation script:
+
+```<sh>
+curl -LsSf https://astral.sh/uv/install.sh | sh
+source $HOME/.local/bin/env
+```
 
 ## How to Use It
 
