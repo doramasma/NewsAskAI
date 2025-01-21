@@ -2,7 +2,7 @@ import uuid
 
 from news_ask_ai.services.chroma_service import ChromaDBService
 from news_ask_ai.services.embedding_service import EmbeddingService
-from news_ask_ai.services.llm_completion_service import LLMCompletionService
+from news_ask_ai.llms.phi35_service import Phi35LLM
 from news_ask_ai.services.search_news_service import SearchNewsService
 from news_ask_ai.utils.logger import setup_logger
 from datetime import date
@@ -23,7 +23,7 @@ class NewsAskEngine:
     ) -> None:
         self.chroma_service = ChromaDBService(collection_name)
         self.embedding_service = EmbeddingService(embedding_model_name)
-        self.llm_service = LLMCompletionService(llm_model_name)
+        self.llm_service = Phi35LLM(llm_model_name)
 
         self.news_service = SearchNewsService(
             language="en",
