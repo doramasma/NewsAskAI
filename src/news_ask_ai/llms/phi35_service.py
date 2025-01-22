@@ -30,10 +30,12 @@ logging.getLogger("torch").setLevel(logging.ERROR)
 
 class Phi35LLM(BaseLLM):
     """
-    A service class for interacting with the LLM model.
+    A service class for interacting with the PHI 3.5 model.
     """
 
-    def __init__(self, model_name: str = "microsoft/Phi-3.5-mini-instruct", temperature: float = 0.1, max_new_tokens: int = 500) -> None:
+    def __init__(
+        self, model_name: str = "microsoft/Phi-3.5-mini-instruct", temperature: float = 0.1, max_new_tokens: int = 500
+    ) -> None:
         super().__init__(model_name, temperature, max_new_tokens)
 
         torch.random.manual_seed(0)
@@ -57,7 +59,6 @@ class Phi35LLM(BaseLLM):
                 model=self.model,
                 tokenizer=self.tokenizer,
             )
-
 
     def get_completions(self, documents: list[str], question: str) -> str:
         """
@@ -85,8 +86,6 @@ class Phi35LLM(BaseLLM):
             output = self.completion_pipeline(messages, **generation_args)
 
         return cast(str, output[0]["generated_text"])
-
-
 
     def get_model_kwargs(self) -> dict[str, Any]:
         """

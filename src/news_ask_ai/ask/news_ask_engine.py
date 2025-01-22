@@ -1,8 +1,8 @@
 import uuid
 
+from news_ask_ai.llms.DeepSeek_R1_service import DeepSeekR1
 from news_ask_ai.services.chroma_service import ChromaDBService
 from news_ask_ai.services.embedding_service import EmbeddingService
-from news_ask_ai.llms.phi35_service import Phi35LLM
 from news_ask_ai.services.search_news_service import SearchNewsService
 from news_ask_ai.utils.logger import setup_logger
 from datetime import date
@@ -19,11 +19,11 @@ class NewsAskEngine:
         self,
         collection_name: str,
         embedding_model_name: str = "BAAI/bge-large-en-v1.5",
-        llm_model_name: str = "microsoft/Phi-3.5-mini-instruct",
+        llm_model_name: str = "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
     ) -> None:
         self.chroma_service = ChromaDBService(collection_name)
         self.embedding_service = EmbeddingService(embedding_model_name)
-        self.llm_service = Phi35LLM(llm_model_name)
+        self.llm_service = DeepSeekR1(llm_model_name)
 
         self.news_service = SearchNewsService(
             language="en",
