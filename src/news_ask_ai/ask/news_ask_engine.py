@@ -18,7 +18,7 @@ class NewsAskEngine:
     def __init__(
         self,
         collection_name: str,
-        embedding_model_name: str = "BAAI/bge-large-en-v1.5",
+        embedding_model_name: str = "Alibaba-NLP/gte-modernbert-base",
         llm_model_name: str = "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
     ) -> None:
         self.chroma_service = ChromaDBService(collection_name)
