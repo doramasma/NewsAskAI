@@ -1,7 +1,7 @@
 import torch
 import logging
 from typing import cast
-from transformers import Qwen2ForCausalLM, AutoTokenizer, pipeline  # type: ignore
+from transformers import LlamaForCausalLM, LlamaTokenizerFast, pipeline  # type: ignore
 
 from news_ask_ai.llms.base import BaseLLM
 from news_ask_ai.llms.prompts.news_rag_prompts import get_system_prompt, get_user_prompt
@@ -17,7 +17,7 @@ class DeepSeekR1(BaseLLM):
 
     def __init__(
         self,
-        model_name: str = "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+        model_name: str = "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
         temperature: float = 0.5,
         max_new_tokens: int = 500,
     ) -> None:
@@ -31,12 +31,12 @@ class DeepSeekR1(BaseLLM):
 
     def initialize_model(self) -> None:
 
-        self.model = Qwen2ForCausalLM.from_pretrained(
+        self.model = LlamaForCausalLM.from_pretrained(
             self.model_name,
             load_in_8bit=True,
         ).eval()
 
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+        self.tokenizer = LlamaTokenizerFast.from_pretrained(self.model_name)
 
         with torch.no_grad():
             self.completion_pipeline = pipeline(
