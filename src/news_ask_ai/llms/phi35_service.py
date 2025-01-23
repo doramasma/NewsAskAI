@@ -1,16 +1,14 @@
 import logging
-from typing import cast
+from typing import Any, cast
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline  # type: ignore
 
-from news_ask_ai.services.prompts.news_rag_prompts import (
+from news_ask_ai.llms.base import BaseLLM
+from news_ask_ai.llms.prompts.news_rag_prompts import (
     get_system_prompt,
     get_user_prompt,
 )
-from news_ask_ai.utils.logger import setup_logger
-
-logger = setup_logger()
 
 logging.getLogger("transformers").setLevel(logging.ERROR)
 logging.getLogger("torch").setLevel(logging.ERROR)
@@ -30,34 +28,30 @@ logging.getLogger("torch").setLevel(logging.ERROR)
 # <|im_start|>assistant<|im_sep|>
 
 
-class LLMCompletionService:
+class Phi35LLM(BaseLLM):
     """
-    A service class for interacting with the LLM model.
+    A service class for interacting with the PHI 3.5 model.
     """
 
-    def __init__(self, model_name: str = "microsoft/Phi-3.5-mini-instruct") -> None:
-        logger.info(f"Initializing the LLM model: {model_name}")
+    def __init__(
+        self, model_name: str = "microsoft/Phi-3.5-mini-instruct", temperature: float = 0.1, max_new_tokens: int = 500
+    ) -> None:
+        super().__init__(model_name, temperature, max_new_tokens)
 
         torch.random.manual_seed(0)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.logger.info(f"Using device: {self.device}")
 
-        logger.info(f"Using device: {self.device}")
+        self.initialize_model()
 
-        model_kwargs = {
-            "device_map": "cuda" if self.device.type == "cuda" else "cpu",
-            "torch_dtype": "auto",
-            "trust_remote_code": True,
-        }
-
-        if self.device.type == "cuda":
-            model_kwargs["attn_implementation"] = "flash_attention_2"
+    def initialize_model(self) -> None:
 
         self.model = AutoModelForCausalLM.from_pretrained(
-            model_name,
-            **model_kwargs,
+            self.model_name,
+            **self.get_model_kwargs(),
         ).eval()
 
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
 
         with torch.no_grad():
             self.completion_pipeline = pipeline(
@@ -66,11 +60,11 @@ class LLMCompletionService:
                 tokenizer=self.tokenizer,
             )
 
-    def get_completions(self, documents: list[str], question: str, max_new_tokens: int = 500) -> str:
+    def get_completions(self, documents: list[str], question: str) -> str:
         """
         Generate completions based on the provided messages.
         """
-        logger.info(f"Creating response for the question: {question}")
+        self.logger.info(f"Creating response for the question: {question}")
 
         formatted_documents = "\n".join(f"document {i + 1}: {s}" for i, s in enumerate(documents))
         messages = [
@@ -82,9 +76,9 @@ class LLMCompletionService:
         ]
 
         generation_args = {
-            "max_new_tokens": max_new_tokens,
+            "max_new_tokens": self.max_new_tokens,
             "return_full_text": False,
-            "temperature": 0.1,
+            "temperature": self.temperature,
             "do_sample": False,
         }
 
@@ -92,3 +86,17 @@ class LLMCompletionService:
             output = self.completion_pipeline(messages, **generation_args)
 
         return cast(str, output[0]["generated_text"])
+
+    def get_model_kwargs(self) -> dict[str, Any]:
+        """
+        Return default kwargs for huggingface model loading.
+        """
+        model_kwargs = {
+            "device_map": "cuda" if self.device.type == "cuda" else "cpu",
+            "torch_dtype": "auto",
+            "trust_remote_code": True,
+        }
+        if self.device.type == "cuda":
+            model_kwargs["attn_implementation"] = "flash_attention_2"
+
+        return model_kwargs
